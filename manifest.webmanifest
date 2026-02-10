@@ -1,0 +1,22 @@
+{
+  "name": "Inchronicity Trainer",
+  "short_name": "IT",
+  "description": "Inchronicity Trainer Web App",
+  "scope": "/Inchronicity-Trainer/",
+  "start_url": "/Incronicity-Trainer/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone", 
+  "icons": [
+    {
+  "src": "/Inchronicity-Trainer/icons/icon-192.png",
+  "type": "image/png",
+  "sizes": "192x192"
+},
+      {
+        "src": "/Inchronicity-Trainer/icons/icon-512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+  ]
+}
