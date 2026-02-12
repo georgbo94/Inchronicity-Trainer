@@ -2,447 +2,420 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inchronocity Trainer</title>
 
 <style>
-
-/* ===== MATCH PITCH SET TRAINER LAYOUT ===== */
-
+/* ===== SAME ROOT MODEL AS WORKING APP ===== */
 html, body {
- height:100dvh;
- margin:0;
- padding:0;
- overflow:hidden;
- top:0; left:0; right:0; bottom:0;
- overscroll-behavior:none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;          /* disable body scroll */
+  position: fixed;           /* pin to viewport */
+  top: 0; left: 0; right: 0; bottom: 0;
+  overscroll-behavior: none; /* disable rubber band */
 }
 
-body{
- background:#f4f4f4;
- display:flex;
- justify-content:flex-start;
- padding-left: clamp(0.5rem, 3vw, 1.5rem);
- padding-top:0.05rem;
- padding-bottom:0.05rem;
- padding-right:0.05rem;
-  font-family:ui-monospace, monospace;
+body {
+  background: #f4f4f4;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0.05rem 0.05rem 0.05rem 1.5rem;
+  font-family: ui-monospace, monospace;
 }
 
-/* DESIGN WIDTH */
-
-.appScale{
- width:605px;
+/* ===== SINGLE CANVAS ROOT (LIKE <main> IN WORKING APP) ===== */
+main.appScale {
+  width: 605px;              /* design width */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* ===== THEME ===== */
-
-:root{
- --card:#f7f7f7;
- --border:#cfcfcf;
- --text:#111;
- --muted:#666;
- --radius:18px;
-}
-
-*{box-sizing:border-box;}
-
-.wrap{
- width:100%;
- padding:18px 0 26px;
-}
-
+/* SCALE ONLY WHEN SCREEN SMALLER THAN DESIGN */
 @media (max-width: 605px) {
-  .appScale {
+  body {
+    padding: 0.05rem; /* critical: otherwise (100vw canvas) + left padding => overflow on phones */
+  }
+  main.appScale {
     transform: scale(calc(100vw / 605));
     transform-origin: top left;
   }
 }
 
+/* ===== THEME ===== */
+:root{
+  --card:#f7f7f7;
+  --border:#cfcfcf;
+  --text:#111;
+  --muted:#666;
+  --radius:18px;
+}
+
+*{ box-sizing:border-box; }
+
+.wrap{
+  width:100%;
+  padding:18px 0 26px;
+}
+
 h1{
- text-align:center;
- margin:4px 0 14px;
+  text-align:center;
+  margin:4px 0 14px;
 }
 
 .card{
- background:var(--card);
- border:1.5px solid var(--border);
- border-radius:var(--radius);
- padding:14px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px;
 }
 
 /* ===== GRID ===== */
-
 .row{
- display:grid;
- grid-template-columns:90px 105px 1fr;
- align-items:center;
- column-gap:10px;
- margin:4px 0;
- padding:1px 1px;
+  display:grid;
+  grid-template-columns:90px 105px 1fr;
+  align-items:center;
+  column-gap:10px;
+  margin:4px 0;
+  padding:1px 1px;
 }
 
 .label{
- font-weight:400;
- white-space:nowrap;
+  font-weight:400;
+  white-space:nowrap;
 }
 
 .toggleGroup{
- display:flex;
- align-items:center;
- gap:6px;
- min-width:90px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:90px;
 }
 
 .toggle{
- display:flex;
- align-items:center;
- gap:6px;
- cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
 }
 
 .switch{
- width:50px;
- height:26px;
- border-radius:999px;
- border:1.5px solid var(--border);
- background:#ddd;
- position:relative;
+  width:50px;
+  height:26px;
+  border-radius:999px;
+  border:1.5px solid var(--border);
+  background:#ddd;
+  position:relative;
 }
 
 .knob{
- width:22px;
- height:22px;
- border-radius:999px;
- background:white;
- position:absolute;
- top:50%;
- left:2px;
- transform:translateY(-50%);
- transition:.15s;
+  width:22px;
+  height:22px;
+  border-radius:999px;
+  background:white;
+  position:absolute;
+  top:50%;
+  left:2px;
+  transform:translateY(-50%);
+  transition:.15s;
 }
 
-.switch.on{
- background:rgba(0,0,0,.25);}
+.switch.on{ background:rgba(0,0,0,.25); }
+.switch.on .knob{ left:26px; }
 
-.switch.on .knob{
- left:26px;
-}
-
-.stateText{
- color:var(--muted);
-}
+.stateText{ color:var(--muted); }
 
 .controls{
- display:flex;
- align-items:center;
- gap:6px;
- flex-wrap:nowrap;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:nowrap;
 }
 
-.sub{
- white-space:nowrap;
-}
+.sub{ white-space:nowrap; }
 
 input,select{
- font-family:inherit;
- font-size:16px;
- padding:6px 6px;
- border:1.5px solid var(--border);
- border-radius:12px;
- background:white;
- color:var(--text);
+  font-family:inherit;
+  font-size:16px;
+  padding:6px 6px;
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  background:white;
+  color:var(--text);
 }
 
 input[type="number"]{ width:62px; }
 
 .sep{
- height:3px;
- background:var(--border);
- opacity:.5;
- margin:8px 0;
+  height:3px;
+  background:var(--border);
+  opacity:.5;
+  margin:8px 0;
 }
 
 .gridWrap{
- border:1.5px solid var(--border);
- border-radius:16px;
- padding:12px;
- background:#fafafa;
+  border:1.5px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  background:#fafafa;
 }
 
 .grid{
- display:grid;
- grid-template-columns:repeat(8,1fr);
- gap:8px;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:8px;
 }
 
 .cell{
- position:relative;
- height:44px;
- border-radius:12px;
- border:1.5px solid var(--border);
- background:white;
+  position:relative;
+  height:44px;
+  border-radius:12px;
+  border:1.5px solid var(--border);
+  background:white;
 }
 
 .beatMark{
- position:absolute;
- left:50%;
- transform:translateX(-50%);
- width:16px;          /* control length here */
- bottom:6px;
- height:3px;
- background:var(--border);
- opacity:.5;
- border-radius:3px;
- pointer-events:none;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:16px;
+  bottom:6px;
+  height:3px;
+  background:var(--border);
+  opacity:.5;
+  border-radius:3px;
+  pointer-events:none;
 }
 
-
-.cell.on{background:#1f1f1f}
-
- 
-
+.cell.on{ background:#1f1f1f; }
 
 .btn{
- width:100%;
- margin-top:16px;
- padding:12px;
-
- border-radius:14px;
- border:1.5px solid var(--border);
- background:#f2f2f2;
-
- font-size:18px;
- font-weight:600;
- letter-spacing:.02em;
-
- cursor:pointer;
+  width:100%;
+  margin-top:16px;
+  padding:12px;
+  border-radius:14px;
+  border:1.5px solid var(--border);
+  background:#f2f2f2;
+  font-size:18px;
+  font-weight:600;
+  letter-spacing:.02em;
+  cursor:pointer;
 }
 
-
 .footer{
- margin-top:10px;
- display:flex;
- justify-content:space-between;
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
 }
 
 .pill{
- border:1.5px solid var(--border);
- border-radius:999px;
- padding:6px 14px;
- white-space:nowrap;
- min-width:110px;
- text-align:center;
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  padding:6px 14px;
+  white-space:nowrap;
+  min-width:110px;
+  text-align:center;
 }
-
 </style>
 </head>
 
 <body>
+  <main class="appScale">
+    <div class="wrap">
+      <h1>Inchronocity Trainer</h1>
 
-<div class="appScale">
-<div class="wrap">
-<h1>Inchronocity Trainer</h1>
+      <div class="card">
 
-<div class="card">
+        <!-- COUNT-IN -->
+        <div class="row">
+          <div class="label">Count-in</div>
+          <div></div>
+          <div class="controls">
+            <input id="countIn" type="number" min="0"/>
+            <div class="sub">beats</div>
+          </div>
+        </div>
 
-<!-- COUNT-IN -->
-<div class="row">
-<div class="label">Count-in</div>
-<div></div>
-<div class="controls">
-<input id="countIn" type="number" min="0"/>
-<div class="sub">beats</div>
-</div>
-</div>
+        <div class="sep"></div>
 
-<div class="sep"></div>
+        <!-- TEMPO -->
+        <div class="row">
+          <div class="label">Tempo</div>
 
-<!-- TEMPO -->
-<div class="row">
-<div class="label">Tempo</div>
+          <div class="toggleGroup">
+            <label class="toggle" id="tempoToggle">
+              <div class="switch" id="tempoSwitch"><div class="knob"></div></div>
+              <div class="stateText" id="tempoTag">Stat</div>
+            </label>
+          </div>
 
-<div class="toggleGroup">
-<label class="toggle" id="tempoToggle">
-<div class="switch" id="tempoSwitch"><div class="knob"></div></div>
-<div class="stateText" id="tempoTag">Stat</div>
-</label>
-</div>
+          <div class="controls">
+            <div id="tempoStatRow" class="controls">
+              <input id="bpmStat" type="number" min="0"/>
+              <div class="sub">BPM</div>
+            </div>
 
-<div class="controls">
+            <div id="tempoDynRow" class="controls" style="display:none;">
+              <input id="bpmStart" type="number" min="0"/>
+              <div class="sub">→</div>
+              <input id="bpmEnd" type="number" min="0"/>
+              <select id="tempoCurve">
+                <option value="lin">Linear</option>
+                <option value="exp">Exp</option>
+              </select>
+              <input id="tempoBars" type="number" min="1"/>
+              <div class="sub">bars</div>
+            </div>
+          </div>
+        </div>
 
-<div id="tempoStatRow" class="controls">
-<input id="bpmStat" type="number" min="0"/>
-<div class="sub">BPM</div>
-</div>
+        <div class="sep"></div>
 
-<div id="tempoDynRow" class="controls" style="display:none;">
-<input id="bpmStart" type="number" min="0"/>
-<div class="sub">→</div>
-<input id="bpmEnd" type="number" min="0"/>
-<select id="tempoCurve">
-<option value="lin">Linear</option>
-<option value="exp">Exp</option>
-</select>
-<input id="tempoBars" type="number" min="1"/>
-<div class="sub">bars</div>
-</div>
+        <!-- SIGNATURE -->
+        <div class="row">
+          <div class="label">Signature</div>
+          <div></div>
+          <div class="controls">
+            <div class="sub">Beats:</div>
+            <input id="sigBeats" type="number" min="1"/>
 
-</div>
-</div>
+            <div class="sub">Subs:</div>
+            <input id="sigP" type="number" min="1"/>
 
-<div class="sep"></div>
+            <div class="sub">SR:</div>
+            <input id="swingPct" type="number" min="0"/>
+            <div class="sub">%</div>
+          </div>
+        </div>
 
-<!-- SIGNATURE -->
-<div class="row">
-<div class="label">Signature</div>
-<div></div>
-<div class="controls">
-<div class="sub">Beats:</div>
-<input id="sigBeats" type="number" min="1"/>
+        <div class="sep"></div>
 
-<div class="sub">Subs:</div>
-<input id="sigP" type="number" min="1"/>
+        <!-- PATTERN -->
+        <div class="row">
+          <div class="label">Length</div>
 
-<div class="sub">SR:</div>
-<input id="swingPct" type="number" min="0"/>
-<div class="sub">%</div>
-</div>
-</div>
+          <div class="toggleGroup">
+            <label class="toggle" id="freeToggle">
+              <div class="switch" id="freeSwitch"><div class="knob"></div></div>
+              <div class="stateText" id="freeTag">Free</div>
+            </label>
+          </div>
 
-<div class="sep"></div>
+          <div class="controls">
+            <input id="intrLen" type="number" min="1"/>
+            <div class="sub">subs</div>
+          </div>
+        </div>
 
-<!-- PATTERN -->
-<div class="row">
-<div class="label">Length</div>
+        <div id="freeRow"></div>
 
-<div class="toggleGroup">
-<label class="toggle" id="freeToggle">
-<div class="switch" id="freeSwitch"><div class="knob"></div></div>
-<div class="stateText" id="freeTag">Free</div>
-</label>
-</div>
+        <div class="sep"></div>
 
-<div class="controls">
-<input id="intrLen" type="number" min="1"/>
-<div class="sub">subs</div>
-</div>
-</div>
+        <!-- GRID -->
+        <div class="gridWrap">
+          <div class="grid" id="grid"></div>
+        </div>
 
-<div id="freeRow"></div>
+        <div class="sep"></div>
 
-<div class="sep"></div>
+        <!-- RANDOMIZE -->
+        <div class="row">
+          <div class="label">Randomize</div>
 
+          <div class="toggleGroup">
+            <label class="toggle" id="randToggle">
+              <div class="switch" id="randSwitch"><div class="knob"></div></div>
+              <div class="stateText" id="randTag">Off</div>
+            </label>
+          </div>
 
+          <div class="controls">
+            <div class="sub">Dislocate:</div>
+            <input id="randLocal" type="number" min="0"/>
+            <div class="sub">%</div>
 
-<!-- GRID -->
-<div class="gridWrap">
-<div class="grid" id="grid"></div>
-</div>
+            <div class="sub" style="margin-left:12px;">Mute:</div>
+            <input id="randMute" type="number" min="0"/>
+            <div class="sub">%</div>
+          </div>
+        </div>
 
-<div class="sep"></div>
+        <div class="sep"></div>
 
+        <!-- ELONGATE -->
+        <div class="row">
+          <div class="label">Elongate</div>
 
-<!-- RANDOMIZE -->
-<div class="row">
-<div class="label">Randomize</div>
+          <div class="toggleGroup">
+            <label class="toggle" id="elongToggle">
+              <div class="switch" id="elongSwitch"><div class="knob"></div></div>
+              <div class="stateText" id="elongTag">Stat</div>
+            </label>
+          </div>
 
-<div class="toggleGroup">
-<label class="toggle" id="randToggle">
-<div class="switch" id="randSwitch"><div class="knob"></div></div>
-<div class="stateText" id="randTag">Off</div>
-</label>
-</div>
+          <div class="controls">
+            <div id="elongStatRow" class="controls">
+              <div class="sub">Factor:</div>
+              <input id="elongStat" type="number" min="1"/>
+              <select id="elongStatMode">
+                <option value="stretch">stretch</option>
+                <option value="fill">fill</option>
+              </select>
+            </div>
 
-<div class="controls">
-<div class="sub">Dislocate:</div>
-<input id="randLocal" type="number" min="0"/>
-<div class="sub">%</div>
+            <div id="elongDynRow" class="controls" style="display:none;">
+              <div class="sub">Max:</div>
+              <input id="elongFinal" type="number" min="1"/>
 
+              <div class="sub">Reps:</div>
+              <input id="elongReps" type="number" min="1"/>
 
-<div class="sub" style="margin-left:12px;">Mute:</div>
-<input id="randMute" type="number" min="0"/>
-<div class="sub">%</div>
+              <select id="elongGrowth">
+                <option value="stretch_x2">stretch x2</option>
+                <option value="stretch_p1">stretch +1</option>
+                <option value="fill_x2">fill x2</option>
+                <option value="fill_p1">fill +1</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-</div>
-</div>
+        <div class="sep"></div>
 
-<div class="sep"></div>
+        <!-- DECRESCENDO -->
+        <div class="row">
+          <div class="label">Diminish</div>
 
+          <div class="toggleGroup">
+            <label class="toggle" id="decToggle">
+              <div class="switch on" id="decSwitch"><div class="knob"></div></div>
+              <div class="stateText" id="decTag">On</div>
+            </label>
+          </div>
 
-<!-- ELONGATE -->
-<div class="row">
-<div class="label">Elongate</div>
+          <div class="controls">
+            <div class="sub">Length:</div>
+            <input id="decPatterns" type="number" min="1"/>
+            <div class="sub">patterns</div>
+          </div>
+        </div>
 
-<div class="toggleGroup">
-<label class="toggle" id="elongToggle">
-<div class="switch" id="elongSwitch"><div class="knob"></div></div>
-<div class="stateText" id="elongTag">Stat</div>
-</label>
-</div>
+        <div class="warn" id="warn" style="display:none;"></div>
 
-<div class="controls">
+        <button class="btn" id="startBtn">Start</button>
 
-<div id="elongStatRow" class="controls">
-<div class="sub">Factor:</div>
-<input id="elongStat" type="number" min="1"/>
-<select id="elongStatMode">
-<option value="stretch">stretch</option>
-<option value="fill">fill</option>
-</select>
-</div>
+        <div class="footer">
+          <div class="pill" id="bpmPill">BPM 120</div>
+          <div class="pill" id="barPill">—</div>
+        </div>
 
-<div id="elongDynRow" class="controls" style="display:none;">
-<div class="sub">Max:</div>
-<input id="elongFinal" type="number" min="1"/>
+      </div>
+    </div>
+  </main>
 
-<div class="sub">Reps:</div>
-<input id="elongReps" type="number" min="1"/>
-
-<select id="elongGrowth">
-<option value="stretch_x2">stretch x2</option>
-<option value="stretch_p1">stretch +1</option>
-<option value="fill_x2">fill x2</option>
-<option value="fill_p1">fill +1</option>
-</select>
-</div>
-
-</div>
-</div>
-
-<div class="sep"></div>
-
-<!-- DECRESCENDO -->
-<div class="row">
-<div class="label">Diminish</div>
-
-<div class="toggleGroup">
-<label class="toggle" id="decToggle">
-<div class="switch on" id="decSwitch"><div class="knob"></div></div>
-<div class="stateText" id="decTag">On</div>
-</label>
-</div>
-
-<div class="controls">
-<div class="sub">Length:</div>
-<input id="decPatterns" type="number" min="1"/>
-<div class="sub">patterns</div>
-</div>
-</div>
-
-<div class="warn" id="warn" style="display:none;"></div>
-
-<button class="btn" id="startBtn">Start</button>
-
-<div class="footer">
-<div class="pill" id="bpmPill">BPM 120</div>
-<div class="pill" id="barPill">—</div>
-</div>
-
-</div>
-</div>
-</div>
-
-<script src="js/app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
