@@ -447,8 +447,8 @@ input[type="number"]{ width:62px; }
 
   if (!localStorage.getItem(FIRST_RUN_KEY)) {
 
-    document.querySelectorAll(".switch").forEach(sw => {
-      sw.classList.remove("on");
+    document.querySelectorAll(".switch.on").forEach(sw => {
+      sw.click();   // triggers your existing toggle logic
     });
 
     localStorage.setItem(FIRST_RUN_KEY, "true");
