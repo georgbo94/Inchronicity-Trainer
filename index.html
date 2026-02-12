@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Inchronocity Trainer</title>
-
-<meta name="theme-color" content="#f4f4f4"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="mobile-web-app-capable" content="yes"/>
 
 <style>
 :root{
@@ -20,8 +16,10 @@
   --radius:18px;
 }
 
-/* ===== App-like outer model (mobile-safe) ===== */
-html{
+*{ box-sizing:border-box; }
+
+/* ===== App-like shell (scroll wrapper NOT scaled) ===== */
+html, body{
   height:100%;
   margin:0;
   padding:0;
@@ -29,50 +27,56 @@ html{
 }
 
 body{
-  height:100dvh;                 /* dynamic viewport height */
-  margin:0;
-  padding:0.05rem 0.05rem 0.05rem 1.5rem;
-  overflow:hidden;               /* body does not scroll */
-  overscroll-behavior:none;      /* reduce bounce/pull-to-refresh */
-  -webkit-text-size-adjust:100%;
-
   background:#f4f4f4;
-  display:flex;
-  justify-content:flex-start;
   font-family:ui-monospace, monospace;
+  overflow:hidden; /* page itself never scrolls */
 }
 
-/* Root container like Pitch Trainer */
-main{
-  width: var(--design-w);
-  flex:1;
-  display:flex;
-  flex-direction:column;
+/* This is the only scroller */
+#app{
+  position:fixed;
+  inset:0;
+  height:100vh;
+  height:100dvh;
 
-  height:100%;
-  overflow-y:auto;               /* scroll happens here */
+  overflow-y:auto;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
 
-  /* Optional: keep safe-area from clipping on iPhone */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  overscroll-behavior:contain; /* helps on supporting browsers */
+  touch-action:pan-y;
+
+  display:flex;
+  justify-content:flex-start;
+
+  padding:0.05rem 0.05rem 0.05rem 1.5rem;
 }
 
-/* Scale when screen smaller than design width */
+/* match your original small-screen padding behavior */
 @media (max-width: 605px){
-  /* prevent left-padding clipping while scaled */
-  body{
-    padding:0.05rem;
-  }
-  main{
-    transform: scale(calc(100vw / var(--design-w)));
-    transform-origin: top left;
-  }
+  #app{ padding:0.05rem; }
 }
 
-*{ box-sizing:border-box; }
+/* Layout box with real (scaled) size so vertical scrolling is correct */
+#scaleBox{
+  position:relative;
+  width:var(--design-w);
+}
 
+/* The UI stays 605px and gets transformed */
+#ui{
+  position:absolute;
+  top:0;
+  left:0;
+  width:var(--design-w);
+  transform-origin:top left;
+
+  /* original "Pitch Trainer" root container vibe */
+  display:flex;
+  flex-direction:column;
+}
+
+/* ===== Your existing UI ===== */
 .wrap{
   width:100%;
   padding:18px 0 26px;
@@ -240,198 +244,291 @@ input[type="number"]{ width:62px; }
 </head>
 
 <body>
-<main>
-  <div class="wrap">
-    <h1>Inchronocity Trainer</h1>
+  <div id="app">
+    <div id="scaleBox">
+      <main id="ui">
+        <div class="wrap">
+          <h1>Inchronocity Trainer</h1>
 
-    <div class="card">
+          <div class="card">
 
-      <!-- COUNT-IN -->
-      <div class="row">
-        <div class="label">Count-in</div>
-        <div></div>
-        <div class="controls">
-          <input id="countIn" type="number" min="0"/>
-          <div class="sub">beats</div>
-        </div>
-      </div>
+            <!-- COUNT-IN -->
+            <div class="row">
+              <div class="label">Count-in</div>
+              <div></div>
+              <div class="controls">
+                <input id="countIn" type="number" min="0"/>
+                <div class="sub">beats</div>
+              </div>
+            </div>
 
-      <div class="sep"></div>
+            <div class="sep"></div>
 
-      <!-- TEMPO -->
-      <div class="row">
-        <div class="label">Tempo</div>
+            <!-- TEMPO -->
+            <div class="row">
+              <div class="label">Tempo</div>
 
-        <div class="toggleGroup">
-          <label class="toggle" id="tempoToggle">
-            <div class="switch" id="tempoSwitch"><div class="knob"></div></div>
-            <div class="stateText" id="tempoTag">Stat</div>
-          </label>
-        </div>
+              <div class="toggleGroup">
+                <label class="toggle" id="tempoToggle">
+                  <div class="switch" id="tempoSwitch"><div class="knob"></div></div>
+                  <div class="stateText" id="tempoTag">Stat</div>
+                </label>
+              </div>
 
-        <div class="controls">
-          <div id="tempoStatRow" class="controls">
-            <input id="bpmStat" type="number" min="0"/>
-            <div class="sub">BPM</div>
+              <div class="controls">
+                <div id="tempoStatRow" class="controls">
+                  <input id="bpmStat" type="number" min="0"/>
+                  <div class="sub">BPM</div>
+                </div>
+
+                <div id="tempoDynRow" class="controls" style="display:none;">
+                  <input id="bpmStart" type="number" min="0"/>
+                  <div class="sub">→</div>
+                  <input id="bpmEnd" type="number" min="0"/>
+                  <select id="tempoCurve">
+                    <option value="lin">Linear</option>
+                    <option value="exp">Exp</option>
+                  </select>
+                  <input id="tempoBars" type="number" min="1"/>
+                  <div class="sub">bars</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <!-- SIGNATURE -->
+            <div class="row">
+              <div class="label">Signature</div>
+              <div></div>
+              <div class="controls">
+                <div class="sub">Beats:</div>
+                <input id="sigBeats" type="number" min="1"/>
+
+                <div class="sub">Subs:</div>
+                <input id="sigP" type="number" min="1"/>
+
+                <div class="sub">SR:</div>
+                <input id="swingPct" type="number" min="0"/>
+                <div class="sub">%</div>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <!-- PATTERN -->
+            <div class="row">
+              <div class="label">Length</div>
+
+              <div class="toggleGroup">
+                <label class="toggle" id="freeToggle">
+                  <div class="switch" id="freeSwitch"><div class="knob"></div></div>
+                  <div class="stateText" id="freeTag">Free</div>
+                </label>
+              </div>
+
+              <div class="controls">
+                <input id="intrLen" type="number" min="1"/>
+                <div class="sub">subs</div>
+              </div>
+            </div>
+
+            <div id="freeRow"></div>
+
+            <div class="sep"></div>
+
+            <!-- GRID -->
+            <div class="gridWrap">
+              <div class="grid" id="grid"></div>
+            </div>
+
+            <div class="sep"></div>
+
+            <!-- RANDOMIZE -->
+            <div class="row">
+              <div class="label">Randomize</div>
+
+              <div class="toggleGroup">
+                <label class="toggle" id="randToggle">
+                  <div class="switch" id="randSwitch"><div class="knob"></div></div>
+                  <div class="stateText" id="randTag">Off</div>
+                </label>
+              </div>
+
+              <div class="controls">
+                <div class="sub">Dislocate:</div>
+                <input id="randLocal" type="number" min="0"/>
+                <div class="sub">%</div>
+
+                <div class="sub" style="margin-left:12px;">Mute:</div>
+                <input id="randMute" type="number" min="0"/>
+                <div class="sub">%</div>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <!-- ELONGATE -->
+            <div class="row">
+              <div class="label">Elongate</div>
+
+              <div class="toggleGroup">
+                <label class="toggle" id="elongToggle">
+                  <div class="switch" id="elongSwitch"><div class="knob"></div></div>
+                  <div class="stateText" id="elongTag">Stat</div>
+                </label>
+              </div>
+
+              <div class="controls">
+                <div id="elongStatRow" class="controls">
+                  <div class="sub">Factor:</div>
+                  <input id="elongStat" type="number" min="1"/>
+                  <select id="elongStatMode">
+                    <option value="stretch">stretch</option>
+                    <option value="fill">fill</option>
+                  </select>
+                </div>
+
+                <div id="elongDynRow" class="controls" style="display:none;">
+                  <div class="sub">Max:</div>
+                  <input id="elongFinal" type="number" min="1"/>
+
+                  <div class="sub">Reps:</div>
+                  <input id="elongReps" type="number" min="1"/>
+
+                  <select id="elongGrowth">
+                    <option value="stretch_x2">stretch x2</option>
+                    <option value="stretch_p1">stretch +1</option>
+                    <option value="fill_x2">fill x2</option>
+                    <option value="fill_p1">fill +1</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <!-- DECRESCENDO -->
+            <div class="row">
+              <div class="label">Diminish</div>
+
+              <div class="toggleGroup">
+                <label class="toggle" id="decToggle">
+                  <div class="switch on" id="decSwitch"><div class="knob"></div></div>
+                  <div class="stateText" id="decTag">On</div>
+                </label>
+              </div>
+
+              <div class="controls">
+                <div class="sub">Length:</div>
+                <input id="decPatterns" type="number" min="1"/>
+                <div class="sub">patterns</div>
+              </div>
+            </div>
+
+            <div class="warn" id="warn" style="display:none;"></div>
+
+            <button class="btn" id="startBtn">Start</button>
+
+            <div class="footer">
+              <div class="pill" id="bpmPill">BPM 120</div>
+              <div class="pill" id="barPill">—</div>
+            </div>
+
           </div>
-
-          <div id="tempoDynRow" class="controls" style="display:none;">
-            <input id="bpmStart" type="number" min="0"/>
-            <div class="sub">→</div>
-            <input id="bpmEnd" type="number" min="0"/>
-            <select id="tempoCurve">
-              <option value="lin">Linear</option>
-              <option value="exp">Exp</option>
-            </select>
-            <input id="tempoBars" type="number" min="1"/>
-            <div class="sub">bars</div>
-          </div>
         </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- SIGNATURE -->
-      <div class="row">
-        <div class="label">Signature</div>
-        <div></div>
-        <div class="controls">
-          <div class="sub">Beats:</div>
-          <input id="sigBeats" type="number" min="1"/>
-
-          <div class="sub">Subs:</div>
-          <input id="sigP" type="number" min="1"/>
-
-          <div class="sub">SR:</div>
-          <input id="swingPct" type="number" min="0"/>
-          <div class="sub">%</div>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- PATTERN -->
-      <div class="row">
-        <div class="label">Length</div>
-
-        <div class="toggleGroup">
-          <label class="toggle" id="freeToggle">
-            <div class="switch" id="freeSwitch"><div class="knob"></div></div>
-            <div class="stateText" id="freeTag">Free</div>
-          </label>
-        </div>
-
-        <div class="controls">
-          <input id="intrLen" type="number" min="1"/>
-          <div class="sub">subs</div>
-        </div>
-      </div>
-
-      <div id="freeRow"></div>
-
-      <div class="sep"></div>
-
-      <!-- GRID -->
-      <div class="gridWrap">
-        <div class="grid" id="grid"></div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- RANDOMIZE -->
-      <div class="row">
-        <div class="label">Randomize</div>
-
-        <div class="toggleGroup">
-          <label class="toggle" id="randToggle">
-            <div class="switch" id="randSwitch"><div class="knob"></div></div>
-            <div class="stateText" id="randTag">Off</div>
-          </label>
-        </div>
-
-        <div class="controls">
-          <div class="sub">Dislocate:</div>
-          <input id="randLocal" type="number" min="0"/>
-          <div class="sub">%</div>
-
-          <div class="sub" style="margin-left:12px;">Mute:</div>
-          <input id="randMute" type="number" min="0"/>
-          <div class="sub">%</div>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- ELONGATE -->
-      <div class="row">
-        <div class="label">Elongate</div>
-
-        <div class="toggleGroup">
-          <label class="toggle" id="elongToggle">
-            <div class="switch" id="elongSwitch"><div class="knob"></div></div>
-            <div class="stateText" id="elongTag">Stat</div>
-          </label>
-        </div>
-
-        <div class="controls">
-          <div id="elongStatRow" class="controls">
-            <div class="sub">Factor:</div>
-            <input id="elongStat" type="number" min="1"/>
-            <select id="elongStatMode">
-              <option value="stretch">stretch</option>
-              <option value="fill">fill</option>
-            </select>
-          </div>
-
-          <div id="elongDynRow" class="controls" style="display:none;">
-            <div class="sub">Max:</div>
-            <input id="elongFinal" type="number" min="1"/>
-
-            <div class="sub">Reps:</div>
-            <input id="elongReps" type="number" min="1"/>
-
-            <select id="elongGrowth">
-              <option value="stretch_x2">stretch x2</option>
-              <option value="stretch_p1">stretch +1</option>
-              <option value="fill_x2">fill x2</option>
-              <option value="fill_p1">fill +1</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- DECRESCENDO -->
-      <div class="row">
-        <div class="label">Diminish</div>
-
-        <div class="toggleGroup">
-          <label class="toggle" id="decToggle">
-            <div class="switch on" id="decSwitch"><div class="knob"></div></div>
-            <div class="stateText" id="decTag">On</div>
-          </label>
-        </div>
-
-        <div class="controls">
-          <div class="sub">Length:</div>
-          <input id="decPatterns" type="number" min="1"/>
-          <div class="sub">patterns</div>
-        </div>
-      </div>
-
-      <div class="warn" id="warn" style="display:none;"></div>
-
-      <button class="btn" id="startBtn">Start</button>
-
-      <div class="footer">
-        <div class="pill" id="bpmPill">BPM 120</div>
-        <div class="pill" id="barPill">—</div>
-      </div>
-
+      </main>
     </div>
   </div>
-</main>
+
+<script>
+/* Responsive fixed-design scaling:
+   - 605px when possible
+   - proportional shrink on smaller screens
+   - no horizontal scroll
+   - correct vertical scroll height after transform
+*/
+(function () {
+  const app = document.getElementById('app');
+  const scaleBox = document.getElementById('scaleBox');
+  const ui = document.getElementById('ui');
+
+  let raf = 0;
+
+  function getDesignW() {
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--design-w').trim();
+    const n = parseFloat(v);
+    return Number.isFinite(n) && n > 0 ? n : 605;
+  }
+
+  function update() {
+    const dw = getDesignW();
+
+    const st = getComputedStyle(app);
+    const padL = parseFloat(st.paddingLeft) || 0;
+    const padR = parseFloat(st.paddingRight) || 0;
+
+    const innerW = Math.max(0, app.clientWidth - padL - padR);
+    const s = Math.min(1, innerW / dw);
+
+    ui.style.transform = `scale(${s})`;
+
+    // transform doesn't affect offsetHeight → gives unscaled height
+    const unscaledH = ui.offsetHeight;
+
+    // avoid subpixel overflow that can trigger horizontal scroll
+    const scaledW = Math.floor(dw * s * 1000) / 1000;
+    const scaledH = Math.ceil(unscaledH * s);
+
+    scaleBox.style.width = scaledW + 'px';
+    scaleBox.style.height = scaledH + 'px';
+  }
+
+  function schedule() {
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      update();
+    });
+  }
+
+  // Recompute on viewport changes
+  window.addEventListener('resize', schedule, { passive:true });
+  window.addEventListener('orientationchange', schedule, { passive:true });
+
+  // Better reaction to mobile toolbar changes
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', schedule, { passive:true });
+    window.visualViewport.addEventListener('scroll', schedule, { passive:true });
+  }
+
+  // Recompute when UI content height changes (toggles, warnings, grid, etc.)
+  const ro = new ResizeObserver(schedule);
+  ro.observe(ui);
+
+  // iOS rubber-band suppression at edges (keeps normal in-between scrolling)
+  let startY = 0;
+  app.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length === 1) startY = e.touches[0].clientY;
+  }, { passive:true });
+
+  app.addEventListener('touchmove', (e) => {
+    if (!e.touches || e.touches.length !== 1) return;
+    const y = e.touches[0].clientY;
+    const dy = y - startY;
+
+    const atTop = app.scrollTop <= 0;
+    const atBottom = app.scrollTop + app.clientHeight >= app.scrollHeight - 1;
+
+    if ((atTop && dy > 0) || (atBottom && dy < 0)) {
+      e.preventDefault();
+    }
+  }, { passive:false });
+
+  // Initial
+  schedule();
+})();
+</script>
 
 <script src="js/app.js"></script>
 </body>
