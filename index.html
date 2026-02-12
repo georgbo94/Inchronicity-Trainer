@@ -1,63 +1,245 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Inchronocity Trainer</title>
 
 <style>
-body{
-  margin:0;
-  font-family:monospace;
+
+html, body {
+ margin:0;
+ padding:0;
+ overflow-x:hidden;
+ background:#f4f4f4;
+ font-family:ui-monospace, monospace;
 }
 
-/* The app row */
+/* DESIGN WIDTH ROOT */
 
-.app{
-  width:605px;
-  transform-origin:top left;
-  border:2px solid black;
-  padding:10px;
-  box-sizing:border-box;
+.appScale{
+ width:605px;
+ transform-origin:top left;
+ box-sizing:border-box;
 }
 
-/* just visual demo */
+/* ===== THEME ===== */
+
+:root{
+ --card:#f7f7f7;
+ --border:#cfcfcf;
+ --text:#111;
+ --muted:#666;
+ --radius:18px;
+}
+
+*{box-sizing:border-box;}
+
+.wrap{
+ width:605px;
+ padding:18px 0 26px;
+}
+
+h1{
+ text-align:center;
+ margin:4px 0 14px;
+}
+
+.card{
+ background:var(--card);
+ border:1.5px solid var(--border);
+ border-radius:var(--radius);
+ padding:14px;
+}
+
+/* GRID */
+
 .row{
-  display:flex;
-  gap:10px;
+ display:grid;
+ grid-template-columns:90px 105px 1fr;
+ align-items:center;
+ column-gap:10px;
+ margin:4px 0;
+ padding:1px 1px;
 }
 
-input{
-  width:80px;
+.label{white-space:nowrap;}
+
+.toggleGroup{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ min-width:90px;
 }
+
+.toggle{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ cursor:pointer;
+}
+
+.switch{
+ width:50px;
+ height:26px;
+ border-radius:999px;
+ border:1.5px solid var(--border);
+ background:#ddd;
+ position:relative;
+}
+
+.knob{
+ width:22px;
+ height:22px;
+ border-radius:999px;
+ background:white;
+ position:absolute;
+ top:50%;
+ left:2px;
+ transform:translateY(-50%);
+ transition:.15s;
+}
+
+.switch.on{background:rgba(0,0,0,.25);}
+.switch.on .knob{left:26px;}
+
+.stateText{color:var(--muted);}
+
+.controls{
+ display:flex;
+ align-items:center;
+ gap:6px;
+}
+
+.sub{white-space:nowrap;}
+
+input,select{
+ font-family:inherit;
+ font-size:16px;
+ padding:6px 6px;
+ border:1.5px solid var(--border);
+ border-radius:12px;
+ background:white;
+ color:var(--text);
+}
+
+input[type="number"]{ width:62px; }
+
+.sep{
+ height:3px;
+ background:var(--border);
+ opacity:.5;
+ margin:8px 0;
+}
+
+.gridWrap{
+ border:1.5px solid var(--border);
+ border-radius:16px;
+ padding:12px;
+ background:#fafafa;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(8,1fr);
+ gap:8px;
+}
+
+.cell{
+ position:relative;
+ height:44px;
+ border-radius:12px;
+ border:1.5px solid var(--border);
+ background:white;
+}
+
+.cell.on{background:#1f1f1f}
+
+.btn{
+ width:100%;
+ margin-top:16px;
+ padding:12px;
+ border-radius:14px;
+ border:1.5px solid var(--border);
+ background:#f2f2f2;
+ font-size:18px;
+ font-weight:600;
+ cursor:pointer;
+}
+
+.footer{
+ margin-top:10px;
+ display:flex;
+ justify-content:space-between;
+}
+
+.pill{
+ border:1.5px solid var(--border);
+ border-radius:999px;
+ padding:6px 14px;
+ min-width:110px;
+ text-align:center;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="app" id="app">
-  <div class="row">
-    <label>Tempo</label>
-    <input type="number" value="120">
-    <button>Start</button>
-  </div>
+<div class="appScale">
+<div class="wrap">
+<h1>Inchronocity Trainer</h1>
+
+<div class="card">
+
+<div class="row">
+<div class="label">Count-in</div>
+<div></div>
+<div class="controls">
+<input id="countIn" type="number" min="0"/>
+<div class="sub">beats</div>
+</div>
 </div>
 
+<div class="sep"></div>
+
+<div class="row">
+<div class="label">Tempo</div>
+<div></div>
+<div class="controls">
+<input id="bpmStat" type="number" min="0"/>
+<div class="sub">BPM</div>
+</div>
+</div>
+
+<div class="sep"></div>
+
+<button class="btn" id="startBtn">Start</button>
+
+</div>
+</div>
+</div>
+
+<script src="js/app.js"></script>
+
 <script>
-function scaleApp(){
+(function(){
 
-  const DESIGN = 605;
-  const app = document.getElementById("app");
+ const DESIGN = 605;
+ const el = document.querySelector(".appScale");
 
-  const scale = Math.min(1, window.innerWidth / DESIGN);
+ function scale(){
 
-  app.style.transform = `scale(${scale})`;
+  const s = Math.min(1, window.innerWidth / DESIGN);
 
-  /* CRITICAL: keep layout width equal to visual width */
-  app.style.width = (DESIGN * scale) + "px";
-}
+  el.style.transform = `scale(${s})`;
+  el.style.width = (DESIGN * s) + "px";
+ }
 
-window.addEventListener("resize", scaleApp);
-window.addEventListener("load", scaleApp);
+ window.addEventListener("resize", scale);
+ window.addEventListener("load", scale);
+
+})();
 </script>
 
 </body>
