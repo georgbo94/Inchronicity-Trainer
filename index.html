@@ -27,16 +27,15 @@ body{
  font-family:ui-monospace, monospace;
 }
 
-/* DESIGN WIDTH */
-
-.appScale{
+/* CHG: appScale container becomes <main>, so target main instead */
+main{
  width:605px;
 }
 
-/* SCALE ONLY WHEN SMALLER */
+/* CHG: scale main, and account for body left+right padding (1.5rem + 0.05rem) */
 @media (max-width: 605px) {
-  .appScale {
-    transform: scale(calc(100vw / 605));
+  main {
+    transform: scale(calc((100vw - 1.55rem) / 605px));
     transform-origin: top left;
   }
 }
@@ -224,7 +223,8 @@ input[type="number"]{ width:62px; }
 
 <body>
 
-<div class="appScale">
+<!-- CHG: was <div class="appScale"> -->
+<main>
 <div class="wrap">
 <h1>Inchronocity Trainer</h1>
 
@@ -419,7 +419,8 @@ input[type="number"]{ width:62px; }
 
 </div>
 </div>
-</div>
+<!-- CHG: was closing </div> for appScale -->
+</main>
 
 <script src="js/app.js"></script>
 </body>
