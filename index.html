@@ -29,7 +29,6 @@ input, select {
   min-width: 0;
 }
 
- 
 body{
  background:#f4f4f4;
  display:flex;
@@ -41,19 +40,9 @@ body{
 /* DESIGN WIDTH */
 
 .appScale{
- width:605px;
+ width:615px;
  transform-origin:top left;
 }
-
-/* (REMOVED) media-query scaling to avoid double-scale */
-/*
-@media (max-width:605px){
- .appScale{
-  transform:scale(calc(100vw / 605));
-  transform-origin:top left;
- }
-}
-*/
 
 /* ===== THEME ===== */
 
@@ -68,7 +57,7 @@ body{
 *{box-sizing:border-box;}
 
 .wrap{
- width:605px;
+ width:615px;
  padding:18px 0 26px;
 }
 
@@ -260,7 +249,7 @@ input[type="number"]{ width:62px; }
 <div class="label">Count-in</div>
 <div></div>
 <div class="controls">
-<input id="countIn" type="number" min="0"/>
+<input id="countIn" type="number" min="0" value="4"/>
 <div class="sub">beats</div>
 </div>
 </div>
@@ -274,26 +263,26 @@ input[type="number"]{ width:62px; }
 <div class="toggleGroup">
 <label class="toggle" id="tempoToggle">
 <div class="switch" id="tempoSwitch"><div class="knob"></div></div>
-<div class="stateText" id="tempoTag">Stat</div>
+<div class="stateText" id="tempoTag">Stat.</div>
 </label>
 </div>
 
 <div class="controls">
 
 <div id="tempoStatRow" class="controls">
-<input id="bpmStat" type="number" min="0"/>
+<input id="bpmStat" type="number" min="0" value="120"/>
 <div class="sub">BPM</div>
 </div>
 
 <div id="tempoDynRow" class="controls" style="display:none;">
-<input id="bpmStart" type="number" min="0"/>
+<input id="bpmStart" type="number" min="0" value="120"/>
 <div class="sub">→</div>
-<input id="bpmEnd" type="number" min="0"/>
+<input id="bpmEnd" type="number" min="0" value="160"/>
 <select id="tempoCurve">
-<option value="lin">Linear</option>
+<option value="lin" selected>Linear</option>
 <option value="exp">Exp</option>
 </select>
-<input id="tempoBars" type="number" min="1"/>
+<input id="tempoBars" type="number" min="1" value="16"/>
 <div class="sub">bars</div>
 </div>
 
@@ -308,13 +297,13 @@ input[type="number"]{ width:62px; }
 <div></div>
 <div class="controls">
 <div class="sub">Beats:</div>
-<input id="sigBeats" type="number" min="1"/>
+<input id="sigBeats" type="number" min="1" value="4"/>
 
 <div class="sub">Subs:</div>
-<input id="sigP" type="number" min="1"/>
+<input id="sigP" type="number" min="1" value="2"/>
 
 <div class="sub">SR:</div>
-<input id="swingPct" type="number" min="0"/>
+<input id="swingPct" type="number" min="0" value="50"/>
 <div class="sub">%</div>
 </div>
 </div>
@@ -328,17 +317,17 @@ input[type="number"]{ width:62px; }
 <div class="toggleGroup">
 <label class="toggle" id="freeToggle">
 <div class="switch" id="freeSwitch"><div class="knob"></div></div>
-<div class="stateText" id="freeTag">Free</div>
+<div class="stateText" id="freeTag">Sig.</div>
 </label>
 </div>
 
 <div class="controls">
-<input id="intrLen" type="number" min="1"/>
+<input id="intrLen" type="number" min="1" value="8"/>
 <div class="sub">subs</div>
 </div>
 </div>
 
-<div id="freeRow"></div>
+<div id="freeRow" style="display:none;"></div>
 
 <div class="sep"></div>
 
@@ -362,11 +351,11 @@ input[type="number"]{ width:62px; }
 
 <div class="controls">
 <div class="sub">Dislocate:</div>
-<input id="randLocal" type="number" min="0"/>
+<input id="randLocal" type="number" min="0" value="0"/>
 <div class="sub">%</div>
 
 <div class="sub" style="margin-left:12px;">Mute:</div>
-<input id="randMute" type="number" min="0"/>
+<input id="randMute" type="number" min="0" value="0"/>
 <div class="sub">%</div>
 
 </div>
@@ -381,7 +370,7 @@ input[type="number"]{ width:62px; }
 <div class="toggleGroup">
 <label class="toggle" id="elongToggle">
 <div class="switch" id="elongSwitch"><div class="knob"></div></div>
-<div class="stateText" id="elongTag">Stat</div>
+<div class="stateText" id="elongTag">Stat.</div>
 </label>
 </div>
 
@@ -389,22 +378,22 @@ input[type="number"]{ width:62px; }
 
 <div id="elongStatRow" class="controls">
 <div class="sub">Factor:</div>
-<input id="elongStat" type="number" min="1"/>
+<input id="elongStat" type="number" min="1" value="1"/>
 <select id="elongStatMode">
-<option value="stretch">stretch</option>
+<option value="stretch" selected>stretch</option>
 <option value="fill">fill</option>
 </select>
 </div>
 
 <div id="elongDynRow" class="controls" style="display:none;">
 <div class="sub">Max:</div>
-<input id="elongFinal" type="number" min="1"/>
+<input id="elongFinal" type="number" min="1" value="8"/>
 
 <div class="sub">Reps:</div>
-<input id="elongReps" type="number" min="1"/>
+<input id="elongReps" type="number" min="1" value="1"/>
 
 <select id="elongGrowth">
-<option value="stretch_x2">stretch x2</option>
+<option value="stretch_x2" selected>stretch x2</option>
 <option value="stretch_p1">stretch +1</option>
 <option value="fill_x2">fill x2</option>
 <option value="fill_p1">fill +1</option>
@@ -429,7 +418,7 @@ input[type="number"]{ width:62px; }
 
 <div class="controls">
 <div class="sub">Length:</div>
-<input id="decPatterns" type="number" min="1"/>
+<input id="decPatterns" type="number" min="1" value="1"/>
 <div class="sub">patterns</div>
 </div>
 </div>
@@ -452,7 +441,7 @@ input[type="number"]{ width:62px; }
 <!-- ===== SAFE SCALING (uniform downscale when too narrow) ===== -->
 <script>
 (function(){
-  const DESIGN = 605;
+  const DESIGN = 615;
   const el = document.getElementById("appScale");
 
   function getHorizontalBodyPaddingPx(){
@@ -463,7 +452,6 @@ input[type="number"]{ width:62px; }
   }
 
   function applyScale(s){
-    // Prefer zoom when supported: scales layout + paint (no layout/scroll mismatch).
     if (window.CSS && CSS.supports && CSS.supports("zoom", "1")) {
       el.style.zoom = String(s);
       el.style.transform = "";
@@ -475,18 +463,14 @@ input[type="number"]{ width:62px; }
 
   function scale(){
     if (!el) return;
-
     const pad = getHorizontalBodyPaddingPx();
     const avail = Math.max(0, window.innerWidth - pad);
     const s = Math.min(1, avail / DESIGN);
-
     applyScale(s);
   }
 
   window.addEventListener("resize", scale, { passive:true });
   window.addEventListener("load", scale);
-
-  // Run immediately (in case load already happened / fast refresh)
   scale();
 })();
 </script>
