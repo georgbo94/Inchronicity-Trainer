@@ -415,8 +415,10 @@ input[type="number"]{ width:62px; }
 
 <div class="toggleGroup">
 <label class="toggle" id="decToggle">
-<div class="switch on" id="decSwitch"><div class="knob"></div></div>
-<div class="stateText" id="decTag">On</div>
+<div class="switch" id="decSwitch">
+<div class="knob"></div>
+</div>
+<div class="stateText" id="decTag">Off</div>
 </label>
 </div>
 
@@ -439,23 +441,6 @@ input[type="number"]{ width:62px; }
 </div>
 </div>
 </div>
-
-<script>
-(function(){
-
-  const FIRST_RUN_KEY = "inchrono_initialized";
-
-  if (!localStorage.getItem(FIRST_RUN_KEY)) {
-
-    document.querySelectorAll(".switch.on").forEach(sw => {
-      sw.click();   // triggers your existing toggle logic
-    });
-
-    localStorage.setItem(FIRST_RUN_KEY, "true");
-  }
-
-})();
-</script>
   
 <script src="js/app.js"></script>
 
