@@ -1184,113 +1184,129 @@ if (!ui.barPillHidden){
     setFree(!!s.free);
   }
 
-  function bind(){
-const hasSaved = !!LS.get("settings_v2", null);
+function bind(){
 
-if (!hasSaved){
-  // write defaults into DOM first
-  el.countIn.value = 0;
+  restoreSettings();
+  syncCommittedFromDom();
 
-  el.bpmStat.value = 120;
-  el.bpmStart.value = 120;
-  el.bpmEnd.value = 160;
-  el.tempoBars.value = 16;
-  el.tempoCurve.value = "lin";
+  el.tempoToggle.addEventListener("click", () => {
+    toggleTempoModeCarry();
+  });
 
-  el.sigBeats.value = 4;
-  el.sigP.value = 2;
-  el.swingPct.value = 50;
+  el.elongToggle.addEventListener("click", () => {
+    setElongMode(ui.elongMode === "stat" ? "dyn" : "stat");
+    persistSettings();
+  });
 
-  el.intrLen.value = 8;
+  el.freeToggle.addEventListener("click", () => {
+    setFree(!ui.free);
+  });
 
-  el.elongStat.value = 1;
-  el.elongStatMode.value = "stretch";
-  el.elongFinal.value = 8;
-  el.elongReps.value = 1;
-  el.elongGrowth.value = "stretch_x2";
+  el.decToggle.addEventListener("click", () => {
+    setDec(!ui.decOn);
+  });
 
-  el.decPatterns.value = 1;
+  el.randToggle.addEventListener("click", () => {
+    setRand(!ui.randOn);
+  });
 
-  el.randLocal.value = 1;
-  el.randMute.value = 0;
+  if (el.barPill){
+    el.barPill.addEventListener("click", () => {
+      ui.barPillHidden = !ui.barPillHidden;
+      updateBarPillHidden();
+    });
+  }
 
-  setTempoMode("stat");
-  setElongMode("stat");
-  setDec(true);
-  setRand(false, false);
-  setFree(false);
+  el.bpmStat.addEventListener("change", () => {
+    commitBpmStatFromField();
+    persistSettings();
+  });
+
+  el.bpmStart.addEventListener("change", () => {
+    commitBpmStartFromField();
+    persistSettings();
+  });
+
+  el.bpmEnd.addEventListener("change", () => {
+    commitBpmEndFromField();
+    if (ui.tempoMode === "dyn" && eng.running) tempoDynRetargetNow();
+    persistSettings();
+  });
+
+  el.tempoBars.addEventListener("change", () => {
+    commitTempoBarsFromField();
+    if (ui.tempoMode === "dyn" && eng.running) tempoDynRetargetNow();
+    persistSettings();
+  });
+
+  el.tempoCurve.addEventListener("change", () => {
+    commitTempoCurveFromField();
+    if (ui.tempoMode === "dyn" && eng.running) tempoDynRetargetNow();
+    persistSettings();
+  });
+
+  const refreshEdit = () => {
+    setEditContext();
+    persistSettings();
+  };
+
+  el.sigBeats.addEventListener("change", refreshEdit);
+  el.sigP.addEventListener("change", refreshEdit);
+  el.intrLen.addEventListener("change", refreshEdit);
+
+  el.swingPct.addEventListener("change", () => {
+    commitSwingFromField();
+    persistSettings();
+  });
+
+  el.randLocal.addEventListener("change", () => {
+    commitRandLocalFromField();
+    persistSettings();
+  });
+
+  el.randMute.addEventListener("change", () => {
+    commitRandMuteFromField();
+    persistSettings();
+  });
+
+  [
+    el.countIn,
+    el.elongStat,
+    el.elongFinal,
+    el.elongReps,
+    el.elongGrowth,
+    el.decPatterns
+  ].forEach(inp =>
+    inp.addEventListener("change", () => {
+      persistSettings();
+    })
+  );
+
+  if (el.elongGrowth){
+    el.elongGrowth.addEventListener("change", () => {
+      eng.elongBlockedIncreasePending = false;
+      eng.elongBlockedIncreaseUsed = false;
+    });
+  }
+
+  el.startBtn.addEventListener("click", () => {
+    showWarn("");
+    if (!eng.running){
+      try{ start(); }
+      catch(e){ showWarn(String(e?.message || e)); }
+    } else {
+      stop();
+    }
+  });
+
+  setEditContext();
+
+  el.bpmPill.textContent =
+    `BPM ${Math.round(clampFloat(committed.bpmStat,20,400))}`;
+
+  updateBarPillHidden();
 }
 
-restoreSettings();
-
-// ← NOW safe to read inputs
-syncCommittedFromDom();
-
-
-    el.tempoToggle.addEventListener("click", () => { toggleTempoModeCarry(); });
-    el.elongToggle.addEventListener("click", () => { setElongMode(ui.elongMode === "stat" ? "dyn" : "stat"); persistSettings(); });
-    el.freeToggle.addEventListener("click", () => { setFree(!ui.free); });
-    el.decToggle.addEventListener("click", () => { setDec(!ui.decOn); });
-
-    el.randToggle.addEventListener("click", () => { setRand(!ui.randOn); });
-
-    if (el.barPill){
-      el.barPill.addEventListener("click", () => {
-        ui.barPillHidden = !ui.barPillHidden;
-        updateBarPillHidden();
-      });
-    }
-
-    el.bpmStat.addEventListener("change", () => { commitBpmStatFromField(); persistSettings(); });
-    el.bpmStart.addEventListener("change", () => { commitBpmStartFromField(); persistSettings(); });
-    el.bpmEnd.addEventListener("change", () => { commitBpmEndFromField(); if (ui.tempoMode === "dyn" && eng.running) tempoDynRetargetNow(); persistSettings(); });
-    el.tempoBars.addEventListener("change", () => { commitTempoBarsFromField(); if (ui.tempoMode === "dyn" && eng.running) tempoDynRetargetNow(); persistSettings(); });
-    el.tempoCurve.addEventListener("change", () => { commitTempoCurveFromField(); if (ui.tempoMode === "dyn" && eng.running) tempoDynRetargetNow(); persistSettings(); });
-
-    const refreshEdit = () => { setEditContext(); persistSettings(); };
-    el.sigBeats.addEventListener("change", refreshEdit);
-    el.sigP.addEventListener("change", refreshEdit);
-    el.intrLen.addEventListener("change", refreshEdit);
-
-    el.swingPct.addEventListener("change", () => {
-      commitSwingFromField();
-      persistSettings();
-    });
-
-    el.randLocal.addEventListener("change", () => {
-      commitRandLocalFromField();
-      persistSettings();
-    });
-
-    el.randMute.addEventListener("change", () => {
-      commitRandMuteFromField();
-      persistSettings();
-    });
-
-    [el.countIn,
-     el.elongStat, el.elongFinal, el.elongReps, el.elongGrowth, el.decPatterns
-    ].forEach(inp => inp.addEventListener("change", () => { persistSettings(); }));
-
-    if (el.elongGrowth){
-      el.elongGrowth.addEventListener("change", () => {
-        eng.elongBlockedIncreasePending = false;
-        eng.elongBlockedIncreaseUsed = false;
-      });
-    }
-
-    el.startBtn.addEventListener("click", () => {
-      showWarn("");
-      if (!eng.running){
-        try{ start(); }catch(e){ showWarn(String(e?.message || e)); }
-      } else {
-        stop();
-      }
-    });
-
-    setEditContext();
-    el.bpmPill.textContent = `BPM ${Math.round(clampFloat(committed.bpmStat,20,400))}`;
-    updateBarPillHidden();
-  }
 
   bind();
 })();
