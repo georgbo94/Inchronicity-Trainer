@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Inchronocity Trainer</title>
+
+<meta name="theme-color" content="#f4f4f4"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 
 <style>
 :root{
@@ -16,22 +20,25 @@
   --radius:18px;
 }
 
-/* ===== Pitch-Trainer-style outer model ===== */
-html, body{
+/* ===== App-like outer model (mobile-safe) ===== */
+html{
   height:100%;
   margin:0;
   padding:0;
-  overflow:hidden;
-  position:fixed;
-  top:0; left:0; right:0; bottom:0;
   overscroll-behavior:none;
 }
 
 body{
+  height:100dvh;                 /* dynamic viewport height */
+  margin:0;
+  padding:0.05rem 0.05rem 0.05rem 1.5rem;
+  overflow:hidden;               /* body does not scroll */
+  overscroll-behavior:none;      /* reduce bounce/pull-to-refresh */
+  -webkit-text-size-adjust:100%;
+
   background:#f4f4f4;
   display:flex;
   justify-content:flex-start;
-  padding:0.05rem 0.05rem 0.05rem 1.5rem;
   font-family:ui-monospace, monospace;
 }
 
@@ -41,7 +48,15 @@ main{
   flex:1;
   display:flex;
   flex-direction:column;
-  overflow:hidden;
+
+  height:100%;
+  overflow-y:auto;               /* scroll happens here */
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+
+  /* Optional: keep safe-area from clipping on iPhone */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Scale when screen smaller than design width */
