@@ -115,7 +115,7 @@ warn: $("warn"),
     tempoMode: "stat",
     elongMode: "stat",
     free: false,
-    decOn: true,
+    decOn: false,
     randOn: false,
 
     barPillHidden: false,
