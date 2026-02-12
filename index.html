@@ -3,43 +3,51 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Trainer Minimal</title>
+<title>Inchronocity Trainer</title>
 
 <style>
 
-html,body{
+html, body {
  margin:0;
- font-family:ui-monospace, monospace;
+ padding:0;
  background:#f4f4f4;
+ font-family:ui-monospace, monospace;
+ overflow-x:hidden;
 }
 
-/* design width */
+body{
+ display:flex;
+ justify-content:flex-start;
+ padding:0.05rem 0.05rem 0.05rem 1.5rem;
+}
+
+/* ===== DESIGN WIDTH ===== */
 
 .appScale{
  width:605px;
- margin:auto;
+ transform-origin:top left;
 }
 
-/* scale down if smaller screen */
-
-@media (max-width:605px){
- .appScale{
-  transform:scale(calc(100vw / 605));
-  transform-origin:top center;
- }
-}
-
-/* theme */
+/* ===== THEME ===== */
 
 :root{
  --card:#f7f7f7;
  --border:#cfcfcf;
  --text:#111;
+ --muted:#666;
  --radius:18px;
 }
 
+*{box-sizing:border-box;}
+
 .wrap{
- padding:20px 0 30px;
+ width:605px;
+ padding:18px 0 26px;
+}
+
+h1{
+ text-align:center;
+ margin:4px 0 14px;
 }
 
 .card{
@@ -51,34 +59,133 @@ html,body{
 
 .row{
  display:grid;
- grid-template-columns:90px 1fr;
- column-gap:10px;
+ grid-template-columns:90px 105px 1fr;
  align-items:center;
- margin:8px 0;
+ column-gap:10px;
+ margin:4px 0;
+ padding:1px 1px;
 }
 
 .label{
  white-space:nowrap;
 }
 
+.toggleGroup{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ min-width:90px;
+}
+
+.toggle{
+ display:flex;
+ align-items:center;
+ gap:6px;
+ cursor:pointer;
+}
+
+.switch{
+ width:50px;
+ height:26px;
+ border-radius:999px;
+ border:1.5px solid var(--border);
+ background:#ddd;
+ position:relative;
+}
+
+.knob{
+ width:22px;
+ height:22px;
+ border-radius:999px;
+ background:white;
+ position:absolute;
+ top:50%;
+ left:2px;
+ transform:translateY(-50%);
+ transition:.15s;
+}
+
+.switch.on{
+ background:rgba(0,0,0,.25);
+}
+
+.switch.on .knob{
+ left:26px;
+}
+
+.stateText{
+ color:var(--muted);
+}
+
 .controls{
  display:flex;
  align-items:center;
+ gap:6px;
+ flex-wrap:nowrap;
+}
+
+.sub{
+ white-space:nowrap;
+}
+
+input,select{
+ font-family:inherit;
+ font-size:16px;
+ padding:6px 6px;
+ border:1.5px solid var(--border);
+ border-radius:12px;
+ background:white;
+ color:var(--text);
+}
+
+input[type="number"]{ width:62px; }
+
+.sep{
+ height:3px;
+ background:var(--border);
+ opacity:.5;
+ margin:8px 0;
+}
+
+.gridWrap{
+ border:1.5px solid var(--border);
+ border-radius:16px;
+ padding:12px;
+ background:#fafafa;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(8,1fr);
  gap:8px;
 }
 
-input{
- font-family:inherit;
- font-size:16px;
- padding:6px;
- border:1.5px solid var(--border);
+.cell{
+ position:relative;
+ height:44px;
  border-radius:12px;
- width:70px;
+ border:1.5px solid var(--border);
+ background:white;
 }
+
+.beatMark{
+ position:absolute;
+ left:50%;
+ transform:translateX(-50%);
+ width:16px;
+ bottom:6px;
+ height:3px;
+ background:var(--border);
+ opacity:.5;
+ border-radius:3px;
+ pointer-events:none;
+}
+
+.cell.on{background:#1f1f1f}
 
 .btn{
  width:100%;
- margin-top:18px;
+ margin-top:16px;
  padding:12px;
  border-radius:14px;
  border:1.5px solid var(--border);
@@ -88,38 +195,83 @@ input{
  cursor:pointer;
 }
 
+.footer{
+ margin-top:10px;
+ display:flex;
+ justify-content:space-between;
+}
+
+.pill{
+ border:1.5px solid var(--border);
+ border-radius:999px;
+ padding:6px 14px;
+ min-width:110px;
+ text-align:center;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="appScale">
+<div class="appScale" id="appScale">
 <div class="wrap">
+<h1>Inchronocity Trainer</h1>
 
 <div class="card">
 
 <div class="row">
-<div class="label">Tempo</div>
+<div class="label">Count-in</div>
+<div></div>
 <div class="controls">
-<input type="number" value="120"/>
-<span>BPM</span>
+<input id="countIn" type="number" min="0"/>
+<div class="sub">beats</div>
 </div>
 </div>
+
+<div class="sep"></div>
 
 <div class="row">
-<div class="label">Length</div>
+<div class="label">Tempo</div>
+<div></div>
 <div class="controls">
-<input type="number" value="16"/>
-<span>subs</span>
+<input id="bpmStat" type="number" min="0"/>
+<div class="sub">BPM</div>
 </div>
 </div>
 
-<button class="btn">Start</button>
+<div class="sep"></div>
+
+<button class="btn" id="startBtn">Start</button>
 
 </div>
+</div>
+</div>
 
-</div>
-</div>
+<script>
+
+/* ===== UNIFORM FULL UI SCALING ===== */
+
+function rescale(){
+
+ const el = document.getElementById("appScale");
+
+ const designW = 605;
+ const designH = el.scrollHeight;
+
+ const s = Math.min(
+  window.innerWidth / designW,
+  window.innerHeight / designH
+ );
+
+ el.style.transform = `scale(${s})`;
+ el.style.width = designW * s + "px";
+}
+
+window.addEventListener("resize", rescale);
+window.addEventListener("load", rescale);
+
+</script>
 
 </body>
 </html>
