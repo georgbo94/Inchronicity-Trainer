@@ -201,8 +201,11 @@ input[type="number"]{ width:62px; }
 }
 
 .cell.on{background:#1f1f1f}
-
 .btn{
+ -webkit-appearance: none;
+ appearance: none;
+ color: var(--text);
+
  width:100%;
  margin-top:16px;
  padding:12px;
@@ -217,6 +220,7 @@ input[type="number"]{ width:62px; }
 
  cursor:pointer;
 }
+
 
 .footer{
  margin-top:10px;
@@ -436,6 +440,23 @@ input[type="number"]{ width:62px; }
 </div>
 </div>
 
+<script>
+(function(){
+
+  const FIRST_RUN_KEY = "inchrono_initialized";
+
+  if (!localStorage.getItem(FIRST_RUN_KEY)) {
+
+    document.querySelectorAll(".switch").forEach(sw => {
+      sw.classList.remove("on");
+    });
+
+    localStorage.setItem(FIRST_RUN_KEY, "true");
+  }
+
+})();
+</script>
+  
 <script src="js/app.js"></script>
 
 <!-- ===== SAFE SCALING (uniform downscale when too narrow) ===== -->
