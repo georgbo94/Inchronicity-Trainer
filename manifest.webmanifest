@@ -7,16 +7,4 @@
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "display": "standalone", 
-  "icons": [
-    {
-  "src": "/Inchronicity-Trainer/icons/icon-192.png",
-  "type": "image/png",
-  "sizes": "192x192"
-},
-      {
-        "src": "/Inchronicity-Trainer/icons/icon-512.png",
-        "type": "image/png",
-        "sizes": "512x512"
-      }
-  ]
 }
