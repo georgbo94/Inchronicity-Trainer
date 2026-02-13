@@ -517,35 +517,10 @@ function decComputeForHit(idx, total){
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const master = ctx.createGain();
     master.gain.value = 0.9;
-
-    // iOS PWA lock-screen stability: route WebAudio through a media element
-    const dest = ctx.createMediaStreamDestination();
-    master.connect(dest);
-
-    const audioEl = document.createElement("audio");
-    audioEl.srcObject = dest.stream;
-    audioEl.autoplay = true;
-    audioEl.loop = true;
-    audioEl.playsInline = true;
-    audioEl.setAttribute("playsinline", "");
-    audioEl.style.display = "none";
-    document.body.appendChild(audioEl);
-
-    audioEl.play().catch(()=>{});
-
+    master.connect(ctx.destination);
     eng.ctx = ctx;
     eng.master = master;
-    eng.mediaAudio = audioEl;
   }
-
-  // iOS can suspend audio on lock/background; try to resume when returning
-  document.addEventListener("visibilitychange", () => {
-    if (!eng.running) return;
-    if (eng.ctx && eng.ctx.state !== "running") {
-      eng.ctx.resume().catch(()=>{});
-    }
-    eng.mediaAudio?.play?.().catch(()=>{});
-  });
 
   // Sounds (exactly two)
   function countInSound(time, strong=false){
